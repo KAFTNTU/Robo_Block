@@ -73,6 +73,18 @@ function _rle(buf){
     return out;
 }
 
+/* --- Повернути HUD --- */
+async function _sendHUD(){
+    if(!window.characteristic) return;
+    const SEND=0xC0,ESC=0xDB,TEND=0xDC,TESC=0xDD;
+    function slip(d){const o=[];for(const b of d){if(b===SEND)o.push(ESC,TEND);else if(b===ESC)o.push(ESC,TESC);else o.push(b);}o.push(SEND);return new Uint8Array(o);}
+    async function wr(b){try{await window.characteristic.writeValue(slip(b));}catch(e){console.warn(e);}await new Promise(r=>setTimeout(r,12));}
+    await wr([0xA0]);
+    await wr([0xB0,0x5E]); /* OP_DISP_HUD */
+    await wr([0xA1]);
+    await wr([0xA2]);
+}
+
 /* --- Надіслати на STM32 --- */
 async function _send(){
     if(!window.characteristic||_sendBusy) return;
@@ -144,6 +156,7 @@ window.PixelEngine = {
     loadFrame(i){ if(i>=0&&i<10)_buf.set(_frames[i]); },
     joyDir:_joyDir, joyAxis:_joyAxis,
     sendFrame:_send,
+    showHUD(){ _sendHUD(); },
     startTick:_startTick, stopTick:_stopTick,
     score(v){ _gs+=v|0; }, getScore(){ return _gs; }, resetScore(){ _gs=0; },
     spriteSet:_spriteSet, spriteMove:_spriteMove,
@@ -498,6 +511,7 @@ window.DISPLAY_CATEGORY=`
   <label text="\u2014 Основне \u2014"></label>
   <block type="disp_clear"></block>
   <block type="disp_send"></block>
+  <block type="disp_hud"></block>
   <block type="disp_text">
     <field name="TXT">Привіт</field><field name="SIZE">small</field>
     <value name="X"><shadow type="math_number"><field name="NUM">0</field></shadow></value>
