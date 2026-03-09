@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -2920,6 +2922,13 @@ function validateWorkspace() {
         window.stopCode = function() { 
             window._shouldStop = true; isCodeRunning = false; window._isRecordingTrack = false;
             sendDrivePacket(0,0,0,0);
+            /* Скинути стан STM32 VM якщо він у RUNNING */
+            if (isConnected && characteristic) {
+                try {
+                    const SEND=0xC0, stop=[0xA3,SEND];
+                    characteristic.writeValue(new Uint8Array(stop)).catch(()=>{});
+                } catch(e){}
+            }
             const btn = document.getElementById('globalRunBtn'); const icon = document.getElementById('runIcon');
             btn.classList.remove('running'); icon.classList.remove('fa-stop'); icon.classList.add('fa-play');
         };
