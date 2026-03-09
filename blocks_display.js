@@ -741,20 +741,21 @@ Blockly.defineBlocksWithJsonArray([
 /* ================================================================
    JS GENERATORS
    ================================================================ */
-const J=Blockly.JavaScript;
+const J=window.javascript?.javascriptGenerator || Blockly.JavaScript;
+J.forBlock = J.forBlock || {};
 const v=(b,n,d)=>J.valueToCode(b,n,J.ORDER_ATOMIC)||d;
 const PE='window.PixelEngine';
 
-J['disp_clear'] =()=>`${PE}.clear();\n`;
-J['disp_send']  =()=>`${PE}.sendFrame();\n`;
-J['disp_fill']  =()=>`${PE}.fill(1);\n`;
+J['disp_clear'] = ()=>`${PE}.clear();\n`;
+J['disp_send'] = ()=>`${PE}.sendFrame();\n`;
+J['disp_fill'] = ()=>`${PE}.fill(1);\n`;
 
-J['disp_text']=(b)=>{
+J['disp_text'] = (b)=>{
   const t=JSON.stringify(b.getFieldValue('TXT')),big=b.getFieldValue('SIZE')==='big'?1:0;
   return `(()=>{const t=${t},x=+${v(b,'X','0')},y=+${v(b,'Y','0')},cw=${big?11:7},ch=${big?18:10};for(let i=0;i<t.length;i++)for(let r=0;r<ch;r++)for(let c=0;c<cw;c++)${PE}.set(x+i*cw+c,y+r,1);})();\n`;
 };
-J['disp_number']=(b)=>`(()=>{const s=String(Math.round(${v(b,'VAL','0')})),x=+${v(b,'X','0')},y=+${v(b,'Y','0')};for(let i=0;i<s.length;i++)for(let r=0;r<10;r++)for(let c=0;c<7;c++)${PE}.set(x+i*7+c,y+r,1);})();\n`;
-J['disp_smile']=(b)=>{
+J['disp_number'] = (b)=>`(()=>{const s=String(Math.round(${v(b,'VAL','0')})),x=+${v(b,'X','0')},y=+${v(b,'Y','0')};for(let i=0;i<s.length;i++)for(let r=0;r<10;r++)for(let c=0;c<7;c++)${PE}.set(x+i*7+c,y+r,1);})();\n`;
+J['disp_smile'] = (b)=>{
   const f=b.getFieldValue('FACE');
   const m=f==='happy'?`for(let i=-5;i<=5;i++)${PE}.set(cx+i,cy+5+Math.round(3*Math.sin((i+5)*Math.PI/10)),1);`
           :f==='sad'?`for(let i=-5;i<=5;i++)${PE}.set(cx+i,cy+8-Math.round(3*Math.sin((i+5)*Math.PI/10)),1);`
@@ -762,56 +763,59 @@ J['disp_smile']=(b)=>{
   return `(()=>{const cx=64,cy=32;${PE}.circle(cx,cy,13,1,false);${PE}.set(cx-4,cy-3,1);${PE}.set(cx-3,cy-3,1);${PE}.set(cx+3,cy-3,1);${PE}.set(cx+4,cy-3,1);${m}})();\n`;
 };
 
-J['disp_pixel_on'] =(b)=>`${PE}.set(${v(b,'X','0')},${v(b,'Y','0')},1);\n`;
-J['disp_pixel_off']=(b)=>`${PE}.set(${v(b,'X','0')},${v(b,'Y','0')},0);\n`;
-J['disp_pixel_get']=(b)=>[`!!${PE}.get(${v(b,'X','0')},${v(b,'Y','0')})`,J.ORDER_FUNCTION_CALL];
-J['disp_line']     =(b)=>`${PE}.line(${v(b,'X1','0')},${v(b,'Y1','0')},${v(b,'X2','127')},${v(b,'Y2','63')},1);\n`;
-J['disp_rect']     =(b)=>`${PE}.rect(${v(b,'X','0')},${v(b,'Y','0')},${v(b,'W','10')},${v(b,'H','10')},1,${b.getFieldValue('FILL')==='1'?'true':'false'});\n`;
-J['disp_circle']   =(b)=>`${PE}.circle(${v(b,'CX','64')},${v(b,'CY','32')},${v(b,'R','10')},1,${b.getFieldValue('FILL')==='1'?'true':'false'});\n`;
-J['disp_random_pixels']=(b)=>`${PE}.randomPixels(${v(b,'N','10')});\n`;
-J['disp_paint']    =(b)=>`${PE}.applyBitmap(${JSON.stringify(b.getFieldValue('GRID'))});\n`;
+J['disp_pixel_on'] = (b)=>`${PE}.set(${v(b,'X','0')},${v(b,'Y','0')},1);\n`;
+J['disp_pixel_off'] = (b)=>`${PE}.set(${v(b,'X','0')},${v(b,'Y','0')},0);\n`;
+J['disp_pixel_get'] = (b)=>[`!!${PE}.get(${v(b,'X','0')},${v(b,'Y','0')})`,J.ORDER_FUNCTION_CALL];
+J['disp_line'] = (b)=>`${PE}.line(${v(b,'X1','0')},${v(b,'Y1','0')},${v(b,'X2','127')},${v(b,'Y2','63')},1);\n`;
+J['disp_rect'] = (b)=>`${PE}.rect(${v(b,'X','0')},${v(b,'Y','0')},${v(b,'W','10')},${v(b,'H','10')},1,${b.getFieldValue('FILL')==='1'?'true':'false'});\n`;
+J['disp_circle'] = (b)=>`${PE}.circle(${v(b,'CX','64')},${v(b,'CY','32')},${v(b,'R','10')},1,${b.getFieldValue('FILL')==='1'?'true':'false'});\n`;
+J['disp_random_pixels'] = (b)=>`${PE}.randomPixels(${v(b,'N','10')});\n`;
+J['disp_paint'] = (b)=>`${PE}.applyBitmap(${JSON.stringify(b.getFieldValue('GRID'))});\n`;
 
-J['disp_anim_frame']=(b)=>`(()=>{${PE}.applyBitmap(${JSON.stringify(b.getFieldValue('GRID'))});${PE}.saveFrame(${b.getFieldValue('IDX')});})();\n`;
-J['disp_anim_save'] =(b)=>`${PE}.saveFrame(${b.getFieldValue('IDX')});\n`;
-J['disp_anim_load'] =(b)=>`${PE}.loadFrame(${b.getFieldValue('IDX')});\n`;
-J['disp_anim_play'] =(b)=>{
+J['disp_anim_frame'] = (b)=>`(()=>{${PE}.applyBitmap(${JSON.stringify(b.getFieldValue('GRID'))});${PE}.saveFrame(${b.getFieldValue('IDX')});})();\n`;
+J['disp_anim_save'] = (b)=>`${PE}.saveFrame(${b.getFieldValue('IDX')});\n`;
+J['disp_anim_load'] = (b)=>`${PE}.loadFrame(${b.getFieldValue('IDX')});\n`;
+
+// Копіюємо всі генератори в forBlock для нового Blockly API
+Object.keys(J).forEach(k => { if(typeof J[k]==='function' && !J.forBlock[k]) J.forBlock[k]=J[k]; });
+J['disp_anim_play'] = (b)=>{
   const f=b.getFieldValue('FROM'),t=b.getFieldValue('TO'),ms=v(b,'MS','200');
   return `(()=>{const PE=${PE},f=${f},t=${t};let cur=f;PE.startTick(${ms},async()=>{PE.loadFrame(cur);await PE.sendFrame();cur=f+((cur-f+1)%(t-f+1));});})();\n`;
 };
-J['disp_anim_stop'] =()=>`${PE}.stopTick();\n`;
+J['disp_anim_stop'] = ()=>`${PE}.stopTick();\n`;
 
 /* Ігровий цикл — ГОЛОВНЕ ВИПРАВЛЕННЯ */
-J['game_loop']=(b)=>{
+J['game_loop'] = (b)=>{
   const ms=v(b,'MS','100');
   const body=J.statementToCode(b,'DO');
   return `${PE}.startTick(${ms},async()=>{\n${body}});\n`;
 };
-J['game_stop']=()=>`${PE}.stopTick();\n`;
+J['game_stop'] = ()=>`${PE}.stopTick();\n`;
 
 /* Спрайти */
-J['sprite_create'] =(b)=>`${PE}.spriteSet(${v(b,'ID','1')},${v(b,'X','0')},${v(b,'Y','0')},${v(b,'W','8')},${v(b,'H','8')});\n`;
-J['sprite_move']   =(b)=>`${PE}.spriteMove(${v(b,'ID','1')},${v(b,'DX','0')},${v(b,'DY','0')});\n`;
-J['sprite_setpos'] =(b)=>{const id=v(b,'ID','1');return `(()=>{const s=${PE}.getSprite(${id});if(s){s.x=${v(b,'X','0')}|0;s.y=${v(b,'Y','0')}|0;}})();\n`;};
-J['sprite_getx']   =(b)=>[`((${PE}.getSprite(${v(b,'ID','1')})||{x:0}).x)`,J.ORDER_FUNCTION_CALL];
-J['sprite_gety']   =(b)=>[`((${PE}.getSprite(${v(b,'ID','1')})||{y:0}).y)`,J.ORDER_FUNCTION_CALL];
-J['sprite_collide']=(b)=>[`${PE}.spriteCollide(${v(b,'A','1')},${v(b,'B','2')})`,J.ORDER_FUNCTION_CALL];
-J['sprite_edge']   =(b)=>[`${PE}.spriteEdge(${v(b,'ID','1')})`,J.ORDER_FUNCTION_CALL];
-J['sprite_draw']   =(b)=>`(()=>{const s=${PE}.getSprite(${v(b,'ID','1')});if(s)for(let r=0;r<s.h;r++)for(let c=0;c<s.w;c++)${PE}.set(s.x+c,s.y+r,1);})();\n`;
-J['sprite_erase']  =(b)=>`(()=>{const s=${PE}.getSprite(${v(b,'ID','1')});if(s)for(let r=0;r<s.h;r++)for(let c=0;c<s.w;c++)${PE}.set(s.x+c,s.y+r,0);})();\n`;
+J['sprite_create'] = (b)=>`${PE}.spriteSet(${v(b,'ID','1')},${v(b,'X','0')},${v(b,'Y','0')},${v(b,'W','8')},${v(b,'H','8')});\n`;
+J['sprite_move'] = (b)=>`${PE}.spriteMove(${v(b,'ID','1')},${v(b,'DX','0')},${v(b,'DY','0')});\n`;
+J['sprite_setpos'] = (b)=>{const id=v(b,'ID','1');return `(()=>{const s=${PE}.getSprite(${id});if(s){s.x=${v(b,'X','0')}|0;s.y=${v(b,'Y','0')}|0;}})();\n`;};
+J['sprite_getx'] = (b)=>[`((${PE}.getSprite(${v(b,'ID','1')})||{x:0}).x)`,J.ORDER_FUNCTION_CALL];
+J['sprite_gety'] = (b)=>[`((${PE}.getSprite(${v(b,'ID','1')})||{y:0}).y)`,J.ORDER_FUNCTION_CALL];
+J['sprite_collide'] = (b)=>[`${PE}.spriteCollide(${v(b,'A','1')},${v(b,'B','2')})`,J.ORDER_FUNCTION_CALL];
+J['sprite_edge'] = (b)=>[`${PE}.spriteEdge(${v(b,'ID','1')})`,J.ORDER_FUNCTION_CALL];
+J['sprite_draw'] = (b)=>`(()=>{const s=${PE}.getSprite(${v(b,'ID','1')});if(s)for(let r=0;r<s.h;r++)for(let c=0;c<s.w;c++)${PE}.set(s.x+c,s.y+r,1);})();\n`;
+J['sprite_erase'] = (b)=>`(()=>{const s=${PE}.getSprite(${v(b,'ID','1')});if(s)for(let r=0;r<s.h;r++)for(let c=0;c<s.w;c++)${PE}.set(s.x+c,s.y+r,0);})();\n`;
 
 /* Джойстик */
-J['game_joy_is']  =(b)=>[`(${PE}.joyDir()==='${b.getFieldValue('DIR')}')`,J.ORDER_EQUALITY];
-J['game_joy_dir'] =()=>[`${PE}.joyDir()`,J.ORDER_FUNCTION_CALL];
-J['game_joy_axis']=(b)=>[`${PE}.joyAxis('${b.getFieldValue('AXIS')}')`,J.ORDER_FUNCTION_CALL];
+J['game_joy_is'] = (b)=>[`(${PE}.joyDir()==='${b.getFieldValue('DIR')}')`,J.ORDER_EQUALITY];
+J['game_joy_dir'] = ()=>[`${PE}.joyDir()`,J.ORDER_FUNCTION_CALL];
+J['game_joy_axis'] = (b)=>[`${PE}.joyAxis('${b.getFieldValue('AXIS')}')`,J.ORDER_FUNCTION_CALL];
 
 /* Рахунок */
-J['game_score_add']  =(b)=>`${PE}.score(${v(b,'VAL','1')});\n`;
-J['game_score_get']  =()=>[`${PE}.getScore()`,J.ORDER_FUNCTION_CALL];
-J['game_score_reset']=()=>`${PE}.resetScore();\n`;
+J['game_score_add'] = (b)=>`${PE}.score(${v(b,'VAL','1')});\n`;
+J['game_score_get'] = ()=>[`${PE}.getScore()`,J.ORDER_FUNCTION_CALL];
+J['game_score_reset'] = ()=>`${PE}.resetScore();\n`;
 
 /* Утиліти */
-J['game_random']=(b)=>[`(Math.floor(Math.random()*(${v(b,'MAX','127')}-${v(b,'MIN','0')}+1))+(${v(b,'MIN','0')}))`,J.ORDER_ADDITION];
-J['game_clamp'] =(b)=>[`Math.max(${v(b,'MIN','0')},Math.min(${v(b,'MAX','127')},${v(b,'VAL','0')}))`,J.ORDER_FUNCTION_CALL];
+J['game_random'] = (b)=>[`(Math.floor(Math.random()*(${v(b,'MAX','127')}-${v(b,'MIN','0')}+1))+(${v(b,'MIN','0')}))`,J.ORDER_ADDITION];
+J['game_clamp'] = (b)=>[`Math.max(${v(b,'MIN','0')},Math.min(${v(b,'MAX','127')},${v(b,'VAL','0')}))`,J.ORDER_FUNCTION_CALL];
 
 
 /* ================================================================
