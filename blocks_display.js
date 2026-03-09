@@ -638,6 +638,7 @@ window.DISPLAY_CATEGORY=`
 Blockly.defineBlocksWithJsonArray([
   /* Основне */
   {"type":"disp_clear","message0":"\uD83D\uDDA5\uFE0F очистити екран","previousStatement":null,"nextStatement":null,"colour":"#4f46e5","tooltip":"\u0421\u0442\u0438\u0440\u0430\u0454 \u0432\u0435\u0441\u044c \u0435\u043a\u0440\u0430\u043d \u2014 \u0432\u0441\u0456 \u043f\u0456\u043a\u0441\u0435\u043b\u0456 \u0433\u0430\u0441\u044f\u0442\u044c\u0441\u044f"},
+  {"type":"disp_hud","message0":"\uD83D\uDCF1 стандартний екран","previousStatement":null,"nextStatement":null,"colour":"#4f46e5","tooltip":"Повертає стандартний HUD екран"},
   {"type":"disp_send","message0":"\uD83D\uDCE4 відправити на екран","previousStatement":null,"nextStatement":null,"colour":"#4f46e5","tooltip":"RLE-стиснення + BT відправка на STM32"},
   {"type":"disp_fill","message0":"\u2588 заповнити екран","previousStatement":null,"nextStatement":null,"colour":"#4f46e5","tooltip":"\u0417\u0430\u043f\u043e\u0432\u043d\u044e\u0454 \u0432\u0435\u0441\u044c \u0435\u043a\u0440\u0430\u043d \u2014 \u0432\u0441\u0456 8192 \u043f\u0456\u043a\u0441\u0435\u043b\u0456 \u0432\u043c\u0438\u043a\u0430\u044e\u0442\u044c\u0441\u044f"},
   {"type":"disp_text","message0":"\uD83D\uDDA5\uFE0F текст %1 %2 X %3 Y %4",
@@ -761,6 +762,7 @@ const v=(b,n,d)=>J.valueToCode(b,n,J.ORDER_ATOMIC)||d;
 const PE='window.PixelEngine';
 
 J['disp_clear'] = ()=>`${PE}.clear();\n`;
+J['disp_hud']   = ()=>`await ${PE}.showHUD();\n`;
 J['disp_send'] = ()=>`${PE}.sendFrame();\n`;
 J['disp_fill'] = ()=>`${PE}.fill(1);\n`;
 
