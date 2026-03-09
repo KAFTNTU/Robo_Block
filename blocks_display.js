@@ -96,6 +96,7 @@ async function _send(){
         const pay=[0x58,(rle.length>>8)&0xFF,rle.length&0xFF,...rle];
         for(let i=0;i<pay.length;i+=16) await wr([0xB0,...pay.slice(i,i+16)]);
         await wr([0xA1]);
+        await wr([0xA2]); /* PCMD_RUN — запустити програму */
     } finally { _sendBusy=false; }
 }
 
